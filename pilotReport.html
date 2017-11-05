@@ -274,9 +274,6 @@ d.tidy &lt;- d.tidy %&gt;%
          location_accuracy = V12)
 
 # code for trial type
-# 1 = no surprise, 2 = surprise trial, 3 = first control trial, 4 = second control trial, 5 = third control trial, 6 = fourth control trial
-#d.tidy &lt;- d.tidy %&gt;%
-#  mutate(trial_type = ifelse(trial_num &lt; 156, 1, ifelse(trial_num == 156, 2, #ifelse(trial_num == 157, 3, ifelse(trial_num == 158, 4, ifelse(trial_num == 159, 5, #6))))))
 d.tidy &lt;- d.tidy %&gt;%
   mutate(trial_type = ifelse(trial_num &lt; 156, &quot;no_surprise&quot;, ifelse(trial_num == 156, &quot;surprise&quot;, ifelse(trial_num == 157, &quot;first_control&quot;, ifelse(trial_num == 158, &quot;second_control&quot;, ifelse(trial_num == 159, &quot;third_control&quot;, &quot;fourth_control&quot;))))))
 
@@ -297,7 +294,7 @@ accuracies &lt;- d.tidy %&gt;%
   group_by(trial_type, probe) %&gt;%
   summarise(average = round((mean(accuracy)), digits = 2))
 allAccuracies &lt;- bind_cols(accuracies, reportedValues)
-knitr::kable(allAccuracies, caption = &quot;Accuracy&quot;, col.names =c(&quot;Trial Type&quot;, &quot;Probe Type&quot;, &quot;Observed Average&quot;, &quot;Reported_Average&quot;))</code></pre>
+knitr::kable(allAccuracies, caption = &quot;Accuracy&quot;, col.names =c(&quot;Trial Type&quot;, &quot;Probe Type&quot;, &quot;Observed Average&quot;, &quot;Reported Average&quot;))</code></pre>
 <table>
 <caption>Accuracy</caption>
 <thead>
@@ -305,7 +302,7 @@ knitr::kable(allAccuracies, caption = &quot;Accuracy&quot;, col.names =c(&quot;T
 <th align="left">Trial Type</th>
 <th align="left">Probe Type</th>
 <th align="right">Observed Average</th>
-<th align="left">Reported_Average</th>
+<th align="left">Reported Average</th>
 </tr>
 </thead>
 <tbody>
