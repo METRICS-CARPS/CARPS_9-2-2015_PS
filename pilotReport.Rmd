@@ -131,7 +131,7 @@ accuracies <- d.tidy %>%
   group_by(trial_type, probe) %>%
   summarise(average = round((mean(accuracy)), digits = 2))
 allAccuracies <- bind_cols(accuracies, reportedValues)
-knitr::kable(allAccuracies, caption = "Accuracy", col.names =c("Trial Type", "Probe Type", "Observed Average", "Reported_Average"))
+knitr::kable(allAccuracies, caption = "Accuracy", col.names =c("Trial Type", "Probe Type", "Observed Average", "Reported Average"))
 
 ```
 
