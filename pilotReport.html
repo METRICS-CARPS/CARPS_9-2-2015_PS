@@ -275,8 +275,10 @@ d.tidy &lt;- d.tidy %&gt;%
 
 # code for trial type
 # 1 = no surprise, 2 = surprise trial, 3 = first control trial, 4 = second control trial, 5 = third control trial, 6 = fourth control trial
+#d.tidy &lt;- d.tidy %&gt;%
+#  mutate(trial_type = ifelse(trial_num &lt; 156, 1, ifelse(trial_num == 156, 2, #ifelse(trial_num == 157, 3, ifelse(trial_num == 158, 4, ifelse(trial_num == 159, 5, #6))))))
 d.tidy &lt;- d.tidy %&gt;%
-  mutate(trial_type = ifelse(trial_num &lt; 156, 1, ifelse(trial_num == 156, 2, ifelse(trial_num == 157, 3, ifelse(trial_num == 158, 4, ifelse(trial_num == 159, 5, 6))))))
+  mutate(trial_type = ifelse(trial_num &lt; 156, &quot;no_surprise&quot;, ifelse(trial_num == 156, &quot;surprise&quot;, ifelse(trial_num == 157, &quot;first_control&quot;, ifelse(trial_num == 158, &quot;second_control&quot;, ifelse(trial_num == 159, &quot;third_control&quot;, &quot;fourth_control&quot;))))))
 
 # trial number no longer neccesary 
 d.tidy &lt;- d.tidy %&gt;%
@@ -290,7 +292,7 @@ d.tidy &lt;- d.tidy %&gt;%
 <h2>Step 4: Run analysis</h2>
 <div id="descriptive-statistics" class="section level3">
 <h3>Descriptive statistics</h3>
-<pre class="r"><code>reportedValues &lt;- data.frame(c(&quot;NA&quot;,&quot;NA&quot;,.89,.30,.25,.80,.70,.75,.80,.75,.75,.85,.70,.80,.80,.80,.75,.7))
+<pre class="r"><code>reportedValues &lt;- data.frame(c(.7,.75,.80,.80,.75,.70,&quot;NA&quot;,&quot;NA&quot;,.89,.75,.75,.85,.30,.25,.80,.70,.80,.80))
 accuracies &lt;- d.tidy %&gt;%
   group_by(trial_type, probe) %&gt;%
   summarise(average = round((mean(accuracy)), digits = 2))
@@ -300,7 +302,7 @@ knitr::kable(allAccuracies, caption = &quot;Accuracy&quot;, col.names =c(&quot;T
 <caption>Accuracy</caption>
 <thead>
 <tr class="header">
-<th align="right">Trial Type</th>
+<th align="left">Trial Type</th>
 <th align="left">Probe Type</th>
 <th align="right">Observed Average</th>
 <th align="left">Reported_Average</th>
@@ -308,112 +310,112 @@ knitr::kable(allAccuracies, caption = &quot;Accuracy&quot;, col.names =c(&quot;T
 </thead>
 <tbody>
 <tr class="odd">
-<td align="right">1</td>
+<td align="left">first_control</td>
+<td align="left">color_accuracy</td>
+<td align="right">0.70</td>
+<td align="left">0.7</td>
+</tr>
+<tr class="even">
+<td align="left">first_control</td>
+<td align="left">identity_accuracy</td>
+<td align="right">0.75</td>
+<td align="left">0.75</td>
+</tr>
+<tr class="odd">
+<td align="left">first_control</td>
+<td align="left">location_accuracy</td>
+<td align="right">0.80</td>
+<td align="left">0.8</td>
+</tr>
+<tr class="even">
+<td align="left">fourth_control</td>
+<td align="left">color_accuracy</td>
+<td align="right">0.80</td>
+<td align="left">0.8</td>
+</tr>
+<tr class="odd">
+<td align="left">fourth_control</td>
+<td align="left">identity_accuracy</td>
+<td align="right">0.75</td>
+<td align="left">0.75</td>
+</tr>
+<tr class="even">
+<td align="left">fourth_control</td>
+<td align="left">location_accuracy</td>
+<td align="right">0.70</td>
+<td align="left">0.7</td>
+</tr>
+<tr class="odd">
+<td align="left">no_surprise</td>
 <td align="left">color_accuracy</td>
 <td align="right">0.00</td>
 <td align="left">NA</td>
 </tr>
 <tr class="even">
-<td align="right">1</td>
+<td align="left">no_surprise</td>
 <td align="left">identity_accuracy</td>
 <td align="right">0.00</td>
 <td align="left">NA</td>
 </tr>
 <tr class="odd">
-<td align="right">1</td>
+<td align="left">no_surprise</td>
 <td align="left">location_accuracy</td>
 <td align="right">0.89</td>
 <td align="left">0.89</td>
 </tr>
 <tr class="even">
-<td align="right">2</td>
-<td align="left">color_accuracy</td>
-<td align="right">0.30</td>
-<td align="left">0.3</td>
-</tr>
-<tr class="odd">
-<td align="right">2</td>
-<td align="left">identity_accuracy</td>
-<td align="right">0.25</td>
-<td align="left">0.25</td>
-</tr>
-<tr class="even">
-<td align="right">2</td>
-<td align="left">location_accuracy</td>
-<td align="right">0.80</td>
-<td align="left">0.8</td>
-</tr>
-<tr class="odd">
-<td align="right">3</td>
-<td align="left">color_accuracy</td>
-<td align="right">0.70</td>
-<td align="left">0.7</td>
-</tr>
-<tr class="even">
-<td align="right">3</td>
-<td align="left">identity_accuracy</td>
-<td align="right">0.75</td>
-<td align="left">0.75</td>
-</tr>
-<tr class="odd">
-<td align="right">3</td>
-<td align="left">location_accuracy</td>
-<td align="right">0.80</td>
-<td align="left">0.8</td>
-</tr>
-<tr class="even">
-<td align="right">4</td>
+<td align="left">second_control</td>
 <td align="left">color_accuracy</td>
 <td align="right">0.75</td>
 <td align="left">0.75</td>
 </tr>
 <tr class="odd">
-<td align="right">4</td>
+<td align="left">second_control</td>
 <td align="left">identity_accuracy</td>
 <td align="right">0.75</td>
 <td align="left">0.75</td>
 </tr>
 <tr class="even">
-<td align="right">4</td>
+<td align="left">second_control</td>
 <td align="left">location_accuracy</td>
 <td align="right">0.85</td>
 <td align="left">0.85</td>
 </tr>
 <tr class="odd">
-<td align="right">5</td>
+<td align="left">surprise</td>
 <td align="left">color_accuracy</td>
-<td align="right">0.70</td>
-<td align="left">0.7</td>
+<td align="right">0.30</td>
+<td align="left">0.3</td>
 </tr>
 <tr class="even">
-<td align="right">5</td>
+<td align="left">surprise</td>
 <td align="left">identity_accuracy</td>
-<td align="right">0.80</td>
-<td align="left">0.8</td>
+<td align="right">0.25</td>
+<td align="left">0.25</td>
 </tr>
 <tr class="odd">
-<td align="right">5</td>
+<td align="left">surprise</td>
 <td align="left">location_accuracy</td>
 <td align="right">0.80</td>
 <td align="left">0.8</td>
 </tr>
 <tr class="even">
-<td align="right">6</td>
+<td align="left">third_control</td>
 <td align="left">color_accuracy</td>
+<td align="right">0.70</td>
+<td align="left">0.7</td>
+</tr>
+<tr class="odd">
+<td align="left">third_control</td>
+<td align="left">identity_accuracy</td>
 <td align="right">0.80</td>
 <td align="left">0.8</td>
 </tr>
-<tr class="odd">
-<td align="right">6</td>
-<td align="left">identity_accuracy</td>
-<td align="right">0.75</td>
-<td align="left">0.75</td>
-</tr>
 <tr class="even">
-<td align="right">6</td>
+<td align="left">third_control</td>
 <td align="left">location_accuracy</td>
-<td align="right">0.70</td>
-<td align="left">0.7</td>
+<td align="right">0.80</td>
+<td align="left">0.8</td>
 </tr>
 </tbody>
 </table>
@@ -427,26 +429,30 @@ counts &lt;- d.tidy %&gt;%
 
 # first chi square test - color accuracy between surprise trial and first control trial
 # reported: χ2(1, N = 40) = 6.40, p = .011, ϕ = .40
-color_accuracy &lt;- bind_rows(counts[4,3:4], counts[7,3:4])
-chisq.test(color_accuracy, correct=FALSE) # had to turn off Yates’ continuity correction.</code></pre>
+color &lt;- counts %&gt;%
+  filter(probe == &quot;color_accuracy&quot;) %&gt;%
+  filter(trial_type == &quot;surprise&quot; | trial_type == &quot;first_control&quot;)
+chisq.test(color[,3:4], correct=FALSE) # had to turn off Yates’ continuity correction.</code></pre>
 <pre><code>## 
 ##  Pearson's Chi-squared test
 ## 
-## data:  color_accuracy
+## data:  color[, 3:4]
 ## X-squared = 6.4, df = 1, p-value = 0.01141</code></pre>
-<pre class="r"><code>abs(phi(color_accuracy))</code></pre>
+<pre class="r"><code>abs(phi(color[,3:4]))</code></pre>
 <pre><code>##      
 ## 1 0.4</code></pre>
-<pre class="r"><code># second chi square test - location accuracy between surprise trial and first control trial
+<pre class="r"><code># second chi square test - identity accuracy between surprise trial and first control trial
 # reported: χ2(1, N = 40) = 10.00, p &lt; .005, ϕ = .50
-location_accuracy &lt;- bind_rows(counts[5,3:4], counts[8,3:4])
-chisq.test(location_accuracy, correct=FALSE)</code></pre>
+identity &lt;- counts %&gt;%
+  filter(probe == &quot;identity_accuracy&quot;) %&gt;%
+  filter(trial_type == &quot;surprise&quot; | trial_type == &quot;first_control&quot;)
+chisq.test(identity[,3:4], correct=FALSE)</code></pre>
 <pre><code>## 
 ##  Pearson's Chi-squared test
 ## 
-## data:  location_accuracy
+## data:  identity[, 3:4]
 ## X-squared = 10, df = 1, p-value = 0.001565</code></pre>
-<pre class="r"><code>abs(phi(location_accuracy))</code></pre>
+<pre class="r"><code>abs(phi(identity[,3:4]))</code></pre>
 <pre><code>##      
 ## 1 0.5</code></pre>
 </div>
