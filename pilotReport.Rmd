@@ -109,9 +109,8 @@ d.tidy <- d.tidy %>%
          location_accuracy = V12)
 
 # code for trial type
-# 1 = no surprise, 2 = surprise trial, 3 = first control trial, 4 = second control trial, 5 = third control trial, 6 = fourth control trial
 d.tidy <- d.tidy %>%
-  mutate(trial_type = ifelse(trial_num < 156, 1, ifelse(trial_num == 156, 2, ifelse(trial_num == 157, 3, ifelse(trial_num == 158, 4, ifelse(trial_num == 159, 5, 6))))))
+  mutate(trial_type = ifelse(trial_num < 156, "no_surprise", ifelse(trial_num == 156, "surprise", ifelse(trial_num == 157, "first_control", ifelse(trial_num == 158, "second_control", ifelse(trial_num == 159, "third_control", "fourth_control"))))))
 
 # trial number no longer neccesary 
 d.tidy <- d.tidy %>%
@@ -127,7 +126,7 @@ d.tidy <- d.tidy %>%
 ### Descriptive statistics
 
 ```{r}
-reportedValues <- data.frame(c("NA","NA",.89,.30,.25,.80,.70,.75,.80,.75,.75,.85,.70,.80,.80,.80,.75,.7))
+reportedValues <- data.frame(c(.7,.75,.80,.80,.75,.70,"NA","NA",.89,.75,.75,.85,.30,.25,.80,.70,.80,.80))
 accuracies <- d.tidy %>%
   group_by(trial_type, probe) %>%
   summarise(average = round((mean(accuracy)), digits = 2))
@@ -146,15 +145,19 @@ counts <- d.tidy %>%
 
 # first chi square test - color accuracy between surprise trial and first control trial
 # reported: χ2(1, N = 40) = 6.40, p = .011, ϕ = .40
-color_accuracy <- bind_rows(counts[4,3:4], counts[7,3:4])
-chisq.test(color_accuracy, correct=FALSE) # had to turn off Yates’ continuity correction.
-abs(phi(color_accuracy))
+color <- counts %>%
+  filter(probe == "color_accuracy") %>%
+  filter(trial_type == "surprise" | trial_type == "first_control")
+chisq.test(color[,3:4], correct=FALSE) # had to turn off Yates’ continuity correction.
+abs(phi(color[,3:4]))
 
-# second chi square test - location accuracy between surprise trial and first control trial
+# second chi square test - identity accuracy between surprise trial and first control trial
 # reported: χ2(1, N = 40) = 10.00, p < .005, ϕ = .50
-location_accuracy <- bind_rows(counts[5,3:4], counts[8,3:4])
-chisq.test(location_accuracy, correct=FALSE)
-abs(phi(location_accuracy))
+identity <- counts %>%
+  filter(probe == "identity_accuracy") %>%
+  filter(trial_type == "surprise" | trial_type == "first_control")
+chisq.test(identity[,3:4], correct=FALSE)
+abs(phi(identity[,3:4]))
 
 ```
 
