@@ -1,0 +1,182 @@
+---
+title: "CARPS Reproducibility Report"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+#### Article ID: CARPS_9-2-2015_PS
+#### Pilot 1: Dawn Finzi
+#### Co-pilot: Kiara Sanchez
+#### Start date: November 2nd, 2017
+#### End date: November 4th, 2017   
+
+-------
+
+#### Methods summary: 
+The authors tested 20 participants on a working memory test with 160 trials. In 155 of these trials, participants had to identify the location of a target letter. However, on one surprise trial (the 156th trial), there was a surprise memory test about the target's identity and color before they were asked about the location of the target letter. After this, there were four control trials in the same format as the surprise trial. 
+
+------
+
+#### Target outcomes: 
+The target outcomes were: location accuracy on the presurprise trials, color accuracy, identity accuracy and location accuracy on the suprise trial, color accuracy, identity accuracy and location accuracy on the first control trial, and color accuracy, identity accuracy and location accuracy on the final three control trials combined. Additionally, two chi-square tests comparing color accuracy on the surprise trial and the first control trial, and identity accuracy on the surprise trial and the first control trial. 
+
+From the article: *"On the presurprise trials, 89% of responses in the location
+task were correct, which indicates that participants
+could easily locate the target by using the critical attribute.
+To analyze the data from the surprise trial, we first
+divided participants into two groups defined by the order
+of the surprise tasks (identity task first vs. color task first).
+We found that the results were almost the same in these
+two groups. Accordingly, we combined the data for these
+groups in the analyses reported here. Only 6 of 20 (30%)
+participants correctly reported the color of the target letter,
+which is not much better than chance level of 25%
+(because there were four choices). Furthermore, performance
+on the identity task (25% correct) was exactly at
+chance level. These results demonstrate that participants
+were not capable of reporting a task-relevant attribute of
+a stimulus that had reached awareness less than 1 s
+before (i.e., attribute amnesia). Moreover, in the surprise
+trial, participants’ performance on the location task,
+unlike their performance on the color and identity tasks,
+was good (80% correct), and in fact was approximately
+as good as their performance on the location task in the
+presurprise trials (89% correct). This indicates that the
+poor performance on the color and identity tasks was not
+induced by the surprise test itself; it more likely reflects
+participants’ failure to remember these attributes.
+Participants exhibited a dramatic increase in reporting
+accuracy for the target letter’s color (70% correct) and
+identity (75% correct) on the first control trial (i.e., the
+trial immediately after the surprise trial). The improvement
+in each case was significant—color: 70% versus
+30%, χ2(1, N = 40) = 6.40, p = .011, ϕ = .40; identity: 75%
+versus 25%, χ2(1, N = 40) = 10.00, p < .005, ϕ = .50.
+Performance on these two tasks remained constant on
+the final three control trials (color: 75%, 70%, and 80%
+correct; identity: 75%, 80%, and 75% correct). Participants’
+performance on the location task was almost the same
+on the surprise trial (80% correct) as on the control trials
+(80%, 85%, 80%, and 70% correct). These results indicate
+a crucial role for expectation in controlling participants’
+ability to report the attributes of a consciously perceived object. Therefore, Experiment 1a showed that when participants
+did not expect to report a particular attribute of
+an attended object, they were incapable of doing so,
+even when that same attribute had reached awareness
+immediately prior to the test."*
+
+------
+
+[The chunk below sets up some formatting options for the R Markdown document]
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE)
+```
+
+## Step 1: Load packages
+
+[Some useful packages are being loaded below. You can add any additional ones you might need too.]
+
+```{r}
+library(tidyverse) # for data munging
+library(knitr) # for kable table formating
+library(haven) # import and export 'SPSS', 'Stata' and 'SAS' Files
+library(readxl) # import excel files
+library(CARPSreports) # custom report functions
+library(psych) # to determine phi value
+```
+
+## Step 2: Load data
+
+```{r}
+d <- read.csv("data/materials-9859-Top-level_materials/12022-Exp1.csv", header=FALSE)
+```
+
+## Step 3: Tidy data
+
+```{r}
+d.tidy <- d %>%
+  select(V1,V3,V7,V10,V11,V12)
+
+# rename variables
+d.tidy <- d.tidy %>%
+  rename(subject_id = V1,
+         trial_num = V3,
+         color_accuracy = V10,
+         identity_accuracy = V11,
+         location_accuracy = V12)
+
+# code for trial type
+d.tidy <- d.tidy %>%
+  mutate(trial_type = ifelse(trial_num < 156, "no_surprise", ifelse(trial_num == 156, "surprise", ifelse(trial_num == 157, "first_control", ifelse(trial_num == 158, "second_control", ifelse(trial_num == 159, "third_control", "fourth_control"))))))
+
+# trial number no longer neccesary 
+d.tidy <- d.tidy %>%
+  select(subject_id, trial_type, color_accuracy, identity_accuracy, location_accuracy)
+
+# make data tidy using gather
+d.tidy <- d.tidy %>%
+  gather(probe, accuracy, color_accuracy, identity_accuracy, location_accuracy)
+```
+
+## Step 4: Run analysis
+
+### Descriptive statistics
+
+```{r}
+reportedValues <- data.frame(c(.7,.75,.80,.80,.75,.70,"NA","NA",.89,.75,.75,.85,.30,.25,.80,.70,.80,.80))
+accuracies <- d.tidy %>%
+  group_by(trial_type, probe) %>%
+  summarise(average = round((mean(accuracy)), digits = 2))
+allAccuracies <- bind_cols(accuracies, reportedValues)
+knitr::kable(allAccuracies, caption = "Accuracy", col.names =c("Trial Type", "Probe Type", "Observed Average", "Reported Average"))
+
+```
+
+### Inferential statistics
+
+```{r}
+# create a counts variable for chi square testing
+counts <- d.tidy %>%
+     group_by(trial_type, probe) %>%
+     summarise(accurate = sum(accuracy==1), inaccurate = sum(accuracy==0))
+
+# first chi square test - color accuracy between surprise trial and first control trial
+# reported: χ2(1, N = 40) = 6.40, p = .011, ϕ = .40
+color <- counts %>%
+  filter(probe == "color_accuracy") %>%
+  filter(trial_type == "surprise" | trial_type == "first_control")
+chisq.test(color[,3:4], correct=FALSE) # had to turn off Yates’ continuity correction.
+abs(phi(color[,3:4]))
+
+# second chi square test - identity accuracy between surprise trial and first control trial
+# reported: χ2(1, N = 40) = 10.00, p < .005, ϕ = .50
+identity <- counts %>%
+  filter(probe == "identity_accuracy") %>%
+  filter(trial_type == "surprise" | trial_type == "first_control")
+chisq.test(identity[,3:4], correct=FALSE)
+abs(phi(identity[,3:4]))
+
+```
+
+## Step 5: Conclusion
+
+[Include the carpsReport function below]
+
+```{r}
+ carpsReport(Report_Type = "pilot", 
+             Article_ID = "CARPS_9-2-2015_PS", 
+             Insufficient_Information_Errors = 0, 
+             Decision_Errors = 0, 
+             Major_Numerical_Errors = 0, 
+             Time_to_Complete = 227, 
+             Author_Assistance = FALSE)
+```
+
+**This reproducibility check was a success, with every finding in the target outcomes able to be reproduced from the data provided. However, the authors did not use Yates continuity correction for the chi square tests (which is the default in R) and did not report this. While we were able to figure this out, this posed a problem for reproducing the chi square results initially.**
+
+```{r session_info, include=TRUE, echo=TRUE, results='markup'}
+devtools::session_info()
+```
