@@ -1,0 +1,297 @@
+---
+title: "CARPS Reproducibility Report"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+---
+
+```{r}
+articleID <- "9-2-2015_PS" # insert the article ID code here e.g., "10-3-2015_PS"
+reportType <- 'final'
+pilotNames <- "Dawn Finzi, Kiara Sanchez" # insert the pilot's name here e.g., "Tom Hardwicke". If there are multiple pilots enter both names in a character string e.g., "Tom Hardwicke, Bob Dylan"
+copilotNames <- "Tom Hardwicke" # insert the co-pilot's name here e.g., "Michael Frank". If there are multiple co-pilots enter both names in a character string e.g., "Tom Hardwicke, Bob Dylan"
+pilotTTC <- 227 # insert the pilot's estimated time to complete (in minutes, fine to approximate) e.g., 120
+copilotTTC <- 60 # insert the co- pilot's estimated time to complete (in minutes, fine to approximate) e.g., 120
+pilotStartDate <- as.Date("11/04/17", format = "%m/%d/%y") # insert the pilot's start date in US format e.g., as.Date("01/25/18", format = "%m/%d/%y")
+copilotStartDate <- as.Date("05/09/18", format = "%m/%d/%y") # insert the co-pilot's start date in US format e.g., as.Date("01/25/18", format = "%m/%d/%y")
+completionDate <- as.Date("05/09/18", format = "%m/%d/%y") # copilot insert the date of final report completion (after any necessary rounds of author assistance) in US format e.g., as.Date("01/25/18", format = "%m/%d/%y")
+```
+
+-------
+
+#### Methods summary: 
+The authors tested 20 participants on a working memory test with 160 trials. In 155 of these trials, participants had to identify the location of a target letter. However, on one surprise trial (the 156th trial), there was a surprise memory test about the target's identity and color before they were asked about the location of the target letter. After this, there were four control trials in the same format as the surprise trial. 
+
+------
+
+#### Target outcomes: 
+The target outcomes were: location accuracy on the presurprise trials, color accuracy, identity accuracy and location accuracy on the suprise trial, color accuracy, identity accuracy and location accuracy on the first control trial, and color accuracy, identity accuracy and location accuracy on the final three control trials combined. Additionally, two chi-square tests comparing color accuracy on the surprise trial and the first control trial, and identity accuracy on the surprise trial and the first control trial. 
+
+From the article: *"On the presurprise trials, 89% of responses in the location task were correct, which indicates that participants could easily locate the target by using the critical attribute. To analyze the data from the surprise trial, we first divided participants into two groups defined by the order of the surprise tasks (identity task first vs. color task first). We found that the results were almost the same in these two groups. Accordingly, we combined the data for these groups in the analyses reported here. Only 6 of 20 (30%) participants correctly reported the color of the target letter, which is not much better than chance level of 25% (because there were four choices). Furthermore, performance on the identity task (25% correct) was exactly at chance level. These results demonstrate that participants were not capable of reporting a task-relevant attribute of a stimulus that had reached awareness less than 1 s before (i.e., attribute amnesia). Moreover, in the surprise trial, participants’ performance on the location task, unlike their performance on the color and identity tasks, was good (80% correct), and in fact was approximately as good as their performance on the location task in the presurprise trials (89% correct). This indicates that the poor performance on the color and identity tasks was not induced by the surprise test itself; it more likely reflects participants’ failure to remember these attributes. Participants exhibited a dramatic increase in reporting accuracy for the target letter’s color (70% correct) and identity (75% correct) on the first control trial (i.e., the trial immediately after the surprise trial). The improvement in each case was significant—color: 70% versus 30%, χ2(1, N = 40) = 6.40, p = .011, ϕ = .40; identity: 75% versus 25%, χ2(1, N = 40) = 10.00, p < .005, ϕ = .50. Performance on these two tasks remained constant on the final three control trials (color: 75%, 70%, and 80% correct; identity: 75%, 80%, and 75% correct). Participants’ performance on the location task was almost the same
+on the surprise trial (80% correct) as on the control trials (80%, 85%, 80%, and 70% correct). These results indicate a crucial role for expectation in controlling participants’ ability to report the attributes of a consciously perceived object. Therefore, Experiment 1a showed that when participants did not expect to report a particular attribute of an attended object, they were incapable of doing so, even when that same attribute had reached awareness immediately prior to the test."*
+
+------
+
+```{r global_options, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE, warning=FALSE, message=FALSE)
+```
+
+# Step 1: Load packages
+
+```{r}
+library(tidyverse) # for data munging
+library(knitr) # for kable table formating
+library(haven) # import and export 'SPSS', 'Stata' and 'SAS' Files
+library(readxl) # import excel files
+library(CARPSreports) # custom report functions
+library(psych) # to determine phi value
+```
+
+```{r}
+# Prepare report object. This will be updated automatically by the reproCheck function each time values are compared.
+reportObject <- data.frame(dummyRow = TRUE, reportedValue = NA, obtainedValue = NA, valueType = NA, percentageError = NA, comparisonOutcome = NA, eyeballCheck = NA)
+```
+
+# Step 2: Load data
+
+```{r}
+d <- read.csv("data/materials-9859-Top-level_materials/12022-Exp1.csv", header=FALSE)
+```
+
+# Step 3: Tidy data
+
+```{r}
+d.tidy <- d %>%
+  select(V1,V3,V7,V10,V11,V12)
+
+# rename variables
+d.tidy <- d.tidy %>%
+  rename(subject_id = V1,
+         trial_num = V3,
+         color_accuracy = V10,
+         identity_accuracy = V11,
+         location_accuracy = V12)
+
+# code for trial type
+d.tidy <- d.tidy %>%
+  mutate(trial_type = ifelse(trial_num < 156, "no_surprise", ifelse(trial_num == 156, "surprise", ifelse(trial_num == 157, "first_control", ifelse(trial_num == 158, "second_control", ifelse(trial_num == 159, "third_control", "fourth_control"))))))
+
+# trial number no longer neccesary 
+d.tidy <- d.tidy %>%
+  select(subject_id, trial_type, color_accuracy, identity_accuracy, location_accuracy)
+
+# make data tidy using gather
+d.tidy <- d.tidy %>%
+  gather(probe, accuracy, color_accuracy, identity_accuracy, location_accuracy)
+```
+
+# Step 4: Run analysis
+
+## Descriptive statistics
+
+```{r}
+reportedValues <- data.frame("Reported_Average" = c(.7,.75,.80,.80,.75,.70,"NA","NA",.89,.75,.75,.85,.30,.25,.80,.70,.80,.80))
+accuracies <- d.tidy %>%
+  group_by(trial_type, probe) %>%
+  summarise(Obtained_Average = round((mean(accuracy)), digits = 2))
+allAccuracies <- bind_cols(accuracies, reportedValues)
+knitr::kable(allAccuracies, caption = "Accuracy")
+```
+
+Everything seems to match. Let's compare and record all of these values.
+
+```{r}
+reportObject <- reproCheck(obtainedValue = allAccuracies %>% filter(trial_type == "first_control", probe == "color_accuracy") %>% pull(Obtained_Average),
+           reportedValue = allAccuracies %>% filter(trial_type == "first_control", probe == "color_accuracy") %>% pull(Reported_Average) %>% as.character(),
+           valueType = "mean")
+
+reportObject <- reproCheck(obtainedValue = allAccuracies %>% filter(trial_type == "first_control", probe == "identity_accuracy") %>% pull(Obtained_Average),
+           reportedValue = allAccuracies %>% filter(trial_type == "first_control", probe == "identity_accuracy") %>% pull(Reported_Average) %>% as.character(),
+           valueType = "mean")
+
+reportObject <- reproCheck(obtainedValue = allAccuracies %>% filter(trial_type == "first_control", probe == "location_accuracy") %>% pull(Obtained_Average),
+           reportedValue = allAccuracies %>% filter(trial_type == "first_control", probe == "location_accuracy") %>% pull(Reported_Average) %>% as.character(),
+           valueType = "mean")
+
+reportObject <- reproCheck(obtainedValue = allAccuracies %>% filter(trial_type == "fourth_control", probe == "color_accuracy") %>% pull(Obtained_Average),
+           reportedValue = allAccuracies %>% filter(trial_type == "fourth_control", probe == "color_accuracy") %>% pull(Reported_Average) %>% as.character(),
+           valueType = "mean")
+
+reportObject <- reproCheck(obtainedValue = allAccuracies %>% filter(trial_type == "fourth_control", probe == "identity_accuracy") %>% pull(Obtained_Average),
+           reportedValue = allAccuracies %>% filter(trial_type == "fourth_control", probe == "identity_accuracy") %>% pull(Reported_Average) %>% as.character(),
+           valueType = "mean")
+
+reportObject <- reproCheck(obtainedValue = allAccuracies %>% filter(trial_type == "fourth_control", probe == "location_accuracy") %>% pull(Obtained_Average),
+           reportedValue = allAccuracies %>% filter(trial_type == "fourth_control", probe == "location_accuracy") %>% pull(Reported_Average) %>% as.character(),
+           valueType = "mean")
+
+reportObject <- reproCheck(obtainedValue = allAccuracies %>% filter(trial_type == "no_surprise", probe == "location_accuracy") %>% pull(Obtained_Average),
+           reportedValue = allAccuracies %>% filter(trial_type == "no_surprise", probe == "location_accuracy") %>% pull(Reported_Average) %>% as.character(),
+           valueType = "mean")
+
+reportObject <- reproCheck(obtainedValue = allAccuracies %>% filter(trial_type == "second_control", probe == "color_accuracy") %>% pull(Obtained_Average),
+           reportedValue = allAccuracies %>% filter(trial_type == "second_control", probe == "color_accuracy") %>% pull(Reported_Average) %>% as.character(),
+           valueType = "mean")
+
+reportObject <- reproCheck(obtainedValue = allAccuracies %>% filter(trial_type == "second_control", probe == "identity_accuracy") %>% pull(Obtained_Average),
+           reportedValue = allAccuracies %>% filter(trial_type == "second_control", probe == "identity_accuracy") %>% pull(Reported_Average) %>% as.character(),
+           valueType = "mean")
+
+reportObject <- reproCheck(obtainedValue = allAccuracies %>% filter(trial_type == "second_control", probe == "location_accuracy") %>% pull(Obtained_Average),
+           reportedValue = allAccuracies %>% filter(trial_type == "second_control", probe == "location_accuracy") %>% pull(Reported_Average) %>% as.character(),
+           valueType = "mean")
+
+reportObject <- reproCheck(obtainedValue = allAccuracies %>% filter(trial_type == "surprise", probe == "color_accuracy") %>% pull(Obtained_Average),
+           reportedValue = allAccuracies %>% filter(trial_type == "surprise", probe == "color_accuracy") %>% pull(Reported_Average) %>% as.character(),
+           valueType = "mean")
+
+reportObject <- reproCheck(obtainedValue = allAccuracies %>% filter(trial_type == "surprise", probe == "identity_accuracy") %>% pull(Obtained_Average),
+           reportedValue = allAccuracies %>% filter(trial_type == "surprise", probe == "identity_accuracy") %>% pull(Reported_Average) %>% as.character(),
+           valueType = "mean")
+
+reportObject <- reproCheck(obtainedValue = allAccuracies %>% filter(trial_type == "surprise", probe == "location_accuracy") %>% pull(Obtained_Average),
+           reportedValue = allAccuracies %>% filter(trial_type == "surprise", probe == "location_accuracy") %>% pull(Reported_Average) %>% as.character(),
+           valueType = "mean")
+
+reportObject <- reproCheck(obtainedValue = allAccuracies %>% filter(trial_type == "third_control", probe == "color_accuracy") %>% pull(Obtained_Average),
+           reportedValue = allAccuracies %>% filter(trial_type == "third_control", probe == "color_accuracy") %>% pull(Reported_Average) %>% as.character(),
+           valueType = "mean")
+
+reportObject <- reproCheck(obtainedValue = allAccuracies %>% filter(trial_type == "first_control", probe == "identity_accuracy") %>% pull(Obtained_Average),
+           reportedValue = allAccuracies %>% filter(trial_type == "third_control", probe == "identity_accuracy") %>% pull(Reported_Average) %>% as.character(),
+           valueType = "mean")
+
+reportObject <- reproCheck(obtainedValue = allAccuracies %>% filter(trial_type == "third_control", probe == "location_accuracy") %>% pull(Obtained_Average),
+           reportedValue = allAccuracies %>% filter(trial_type == "third_control", probe == "location_accuracy") %>% pull(Reported_Average) %>% as.character(),
+           valueType = "mean")
+
+```
+
+## Inferential statistics
+
+```{r}
+# create a counts variable for chi square testing
+counts <- d.tidy %>%
+     group_by(trial_type, probe) %>%
+     summarise(accurate = sum(accuracy==1), inaccurate = sum(accuracy==0))
+
+# first chi square test - color accuracy between surprise trial and first control trial
+# reported: χ2(1, N = 40) = 6.40, p = .011, ϕ = .40
+color <- counts %>%
+  filter(probe == "color_accuracy") %>%
+  filter(trial_type == "surprise" | trial_type == "first_control")
+chi.out <- chisq.test(color[,3:4], correct=FALSE) # had to turn off Yates’ continuity correction.
+phi.out <- abs(phi(color[,3:4]))
+
+reportObject <- reproCheck(obtainedValue = chi.out$parameter,
+           reportedValue = "1",
+           valueType = "df")
+
+reportObject <- reproCheck(obtainedValue = sum(chi.out$observed),
+           reportedValue = "40",
+           valueType = "n")
+
+reportObject <- reproCheck(obtainedValue = chi.out$statistic,
+           reportedValue = "6.40",
+           valueType = "x2")
+
+reportObject <- reproCheck(obtainedValue = chi.out$p.value,
+           reportedValue = ".011",
+           valueType = "p")
+
+reportObject <- reproCheck(obtainedValue = phi.out,
+           reportedValue = ".40",
+           valueType = "es")
+
+# second chi square test - identity accuracy between surprise trial and first control trial
+# reported: χ2(1, N = 40) = 10.00, p < .005, ϕ = .50
+identity <- counts %>%
+  filter(probe == "identity_accuracy") %>%
+  filter(trial_type == "surprise" | trial_type == "first_control")
+chi.out <- chisq.test(identity[,3:4], correct=FALSE)
+phi.out <- abs(phi(identity[,3:4]))
+
+reportObject <- reproCheck(obtainedValue = chi.out$parameter,
+           reportedValue = "1",
+           valueType = "df")
+
+reportObject <- reproCheck(obtainedValue = sum(chi.out$observed),
+           reportedValue = "40",
+           valueType = "n")
+
+reportObject <- reproCheck(obtainedValue = chi.out$statistic,
+           reportedValue = "10.00",
+           valueType = "x2")
+
+reportObject <- reproCheck(obtainedValue = chi.out$p.value,
+           reportedValue = "<.005",
+           valueType = "p",
+           eyeballCheck = TRUE)
+
+reportObject <- reproCheck(obtainedValue = phi.out,
+           reportedValue = ".50",
+           valueType = "es")
+
+```
+
+# Step 5: Conclusion
+
+This reproducibility check was a success, with every finding in the target outcomes able to be reproduced from the data provided. However, the authors did not use Yates continuity correction for the chi square tests (which is the default in R) and did not report this. While we were able to figure this out, this posed a problem for reproducing the chi square results initially.
+
+```{r}
+Author_Assistance = FALSE # was author assistance provided? (if so, enter TRUE)
+
+Insufficient_Information_Errors <- 0 # how many discrete insufficient information issues did you encounter?
+
+# Assess the causal locus (discrete reproducibility issues) of any reproducibility errors. Note that there doesn't necessarily have to be a one-to-one correspondance between discrete reproducibility issues and reproducibility errors. For example, it could be that the original article neglects to mention that a Greenhouse-Geisser correct was applied to ANOVA outcomes. This might result in multiple reproducibility errors, but there is a single causal locus (discrete reproducibility issue).
+
+locus_typo <- NA # how many discrete issues did you encounter that related to typographical errors?
+locus_specification <- NA # how many discrete issues did you encounter that related to incomplete, incorrect, or unclear specification of the original analyses?
+locus_analysis <- NA # how many discrete issues did you encounter that related to errors in the authors' original analyses?
+locus_data <- NA # how many discrete issues did you encounter that related to errors in the data files shared by the authors?
+locus_unidentified <- NA # how many discrete issues were there for which you could not identify the cause
+
+Affects_Conclusion <- NA # Do any reproducibility issues encounter appear to affect the conclusions made in the original article? This is a subjective judgement, but you should taking into account multiple factors, such as the presence/absence of decision errors, the number of target outcomes that could not be reproduced, the type of outcomes that could or could not be reproduced, the difference in magnitude of effect sizes, and the predictions of the specific hypothesis under scrutiny.
+```
+
+```{r}
+reportObject <- reportObject %>%
+  filter(dummyRow == FALSE) %>% # remove the dummy row
+  select(-dummyRow) %>% # remove dummy row designation
+  mutate(articleID = articleID) %>% # add the articleID 
+  select(articleID, everything()) # make articleID first column
+
+# decide on final outcome
+if(any(reportObject$comparisonOutcome != "MATCH") | Insufficient_Information_Errors > 0){
+  finalOutcome <- "Failure without author assistance"
+  if(Author_Assistance == T){
+    finalOutcome <- "Failure despite author assistance"
+  }
+}else{
+  finalOutcome <- "Success without author assistance"
+  if(Author_Assistance == T){
+    finalOutcome <- "Success with author assistance"
+  }
+}
+
+# collate report extra details
+reportExtras <- data.frame(articleID, pilotNames, copilotNames, pilotTTC, copilotTTC, pilotStartDate, copilotStartDate, completionDate, Author_Assistance, finalOutcome, Insufficient_Information_Errors, locus_typo, locus_specification, locus_analysis, locus_data, locus_unidentified)
+
+# save report objects
+if(reportType == "pilot"){
+  write_csv(reportObject, "pilotReportDetailed.csv")
+  write_csv(reportExtras, "pilotReportExtras.csv")
+}
+
+if(reportType == "final"){
+  write_csv(reportObject, "finalReportDetailed.csv")
+  write_csv(reportExtras, "finalReportExtras.csv")
+}
+```
+
+# Session information
+
+```{r session_info, include=TRUE, echo=TRUE, results='markup'}
+devtools::session_info()
+```

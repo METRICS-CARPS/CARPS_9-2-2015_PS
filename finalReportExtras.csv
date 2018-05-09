@@ -1,0 +1,2 @@
+articleID,pilotNames,copilotNames,pilotTTC,copilotTTC,pilotStartDate,copilotStartDate,completionDate,Author_Assistance,finalOutcome,Insufficient_Information_Errors,locus_typo,locus_specification,locus_analysis,locus_data,locus_unidentified
+9-2-2015_PS,"Dawn Finzi, Kiara Sanchez",Tom Hardwicke,227,60,2017-11-04,2018-05-09,2018-05-09,FALSE,Success without author assistance,0,NA,NA,NA,NA,NA
