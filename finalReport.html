@@ -511,8 +511,8 @@ reportObject &lt;- reproCheck(obtainedValue = chi.out$parameter,
 <pre><code>## [1] &quot;MATCH for p. The reported value (0.011) and the obtained value (0.011) differed by 0%. NB obtained value was rounded to 3 decimal places.&quot;</code></pre>
 <pre class="r"><code>reportObject &lt;- reproCheck(obtainedValue = phi.out,
            reportedValue = &quot;.40&quot;,
-           valueType = &quot;es&quot;)</code></pre>
-<pre><code>## [1] &quot;MATCH for es. The reported value (0.4) and the obtained value (0.4) differed by 0%. NB obtained value was rounded to 2 decimal places.&quot;</code></pre>
+           valueType = &quot;phi&quot;)</code></pre>
+<pre><code>## [1] &quot;MATCH for phi. The reported value (0.4) and the obtained value (0.4) differed by 0%. NB obtained value was rounded to 2 decimal places.&quot;</code></pre>
 <pre class="r"><code># second chi square test - identity accuracy between surprise trial and first control trial
 # reported: χ2(1, N = 40) = 10.00, p &lt; .005, ϕ = .50
 identity &lt;- counts %&gt;%
@@ -540,13 +540,13 @@ reportObject &lt;- reproCheck(obtainedValue = chi.out$parameter,
 <pre><code>## [1] &quot;MATCH for p. Eyeball comparison only.&quot;</code></pre>
 <pre class="r"><code>reportObject &lt;- reproCheck(obtainedValue = phi.out,
            reportedValue = &quot;.50&quot;,
-           valueType = &quot;es&quot;)</code></pre>
-<pre><code>## [1] &quot;MATCH for es. The reported value (0.5) and the obtained value (0.5) differed by 0%. NB obtained value was rounded to 2 decimal places.&quot;</code></pre>
+           valueType = &quot;phi&quot;)</code></pre>
+<pre><code>## [1] &quot;MATCH for phi. The reported value (0.5) and the obtained value (0.5) differed by 0%. NB obtained value was rounded to 2 decimal places.&quot;</code></pre>
 </div>
 </div>
 <div id="step-5-conclusion" class="section level1">
 <h1>Step 5: Conclusion</h1>
-<p>This reproducibility check was a success, with every finding in the target outcomes able to be reproduced from the data provided. However, the authors did not use Yates continuity correction for the chi square tests (which is the default in R) and did not report this. While we were able to figure this out, this posed a problem for reproducing the chi square results initially.</p>
+<p>This reproducibility check was a success, with every finding in the target outcomes able to be reproduced from the data provided.</p>
 <pre class="r"><code>Author_Assistance = FALSE # was author assistance provided? (if so, enter TRUE)
 
 Insufficient_Information_Errors &lt;- 0 # how many discrete insufficient information issues did you encounter?
@@ -603,7 +603,7 @@ if(reportType == &quot;final&quot;){
 ##  language (EN)                        
 ##  collate  en_US.UTF-8                 
 ##  tz       America/Los_Angeles         
-##  date     2018-05-31                  
+##  date     2018-06-13                  
 ## 
 ##  package      * version  date      
 ##  assertthat     0.2.0    2017-04-11
@@ -612,7 +612,7 @@ if(reportType == &quot;final&quot;){
 ##  bindr          0.1      2016-11-13
 ##  bindrcpp     * 0.2      2017-06-17
 ##  broom          0.4.2    2017-02-13
-##  CARPSreports * 0.1      2018-05-10
+##  CARPSreports * 0.1      2018-06-13
 ##  cellranger     1.1.0    2016-07-27
 ##  cli            1.0.0    2017-11-05
 ##  colorspace     1.3-2    2016-12-14
@@ -655,7 +655,7 @@ if(reportType == &quot;final&quot;){
 ##  psych        * 1.7.3.21 2017-03-22
 ##  purrr        * 0.2.4    2017-10-18
 ##  R6             2.2.2    2017-06-17
-##  Rcpp           0.12.16  2018-03-13
+##  Rcpp           0.12.17  2018-05-18
 ##  readr        * 1.1.1    2017-05-16
 ##  readxl       * 1.1.0    2018-04-20
 ##  reshape2       1.4.3    2017-12-11
@@ -666,8 +666,8 @@ if(reportType == &quot;final&quot;){
 ##  rvest          0.3.2    2016-06-17
 ##  scales         0.5.0    2017-08-24
 ##  stats        * 3.4.3    2017-12-07
-##  stringi        1.1.7    2018-03-12
-##  stringr      * 1.3.0    2018-02-19
+##  stringi        1.2.2    2018-05-02
+##  stringr      * 1.3.1    2018-05-10
 ##  tibble       * 1.4.2    2018-01-22
 ##  tidyr        * 0.7.2    2017-10-16
 ##  tidyselect     0.2.3    2017-11-06
@@ -684,7 +684,7 @@ if(reportType == &quot;final&quot;){
 ##  cran (@0.1)                                
 ##  cran (@0.2)                                
 ##  cran (@0.4.2)                              
-##  Github (METRICS-CARPS/CARPSreports@8bfce9e)
+##  Github (METRICS-CARPS/CARPSreports@8259d04)
 ##  cran (@1.1.0)                              
 ##  cran (@1.0.0)                              
 ##  cran (@1.3-2)                              
@@ -727,7 +727,7 @@ if(reportType == &quot;final&quot;){
 ##  cran (@1.7.3.2)                            
 ##  cran (@0.2.4)                              
 ##  CRAN (R 3.4.0)                             
-##  cran (@0.12.16)                            
+##  cran (@0.12.17)                            
 ##  cran (@1.1.1)                              
 ##  cran (@1.1.0)                              
 ##  cran (@1.4.3)                              
@@ -738,8 +738,8 @@ if(reportType == &quot;final&quot;){
 ##  cran (@0.3.2)                              
 ##  cran (@0.5.0)                              
 ##  local                                      
-##  cran (@1.1.7)                              
-##  cran (@1.3.0)                              
+##  cran (@1.2.2)                              
+##  cran (@1.3.1)                              
 ##  CRAN (R 3.4.3)                             
 ##  cran (@0.7.2)                              
 ##  cran (@0.2.3)                              

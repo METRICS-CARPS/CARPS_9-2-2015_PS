@@ -202,7 +202,7 @@ reportObject <- reproCheck(obtainedValue = chi.out$p.value,
 
 reportObject <- reproCheck(obtainedValue = phi.out,
            reportedValue = ".40",
-           valueType = "es")
+           valueType = "phi")
 
 # second chi square test - identity accuracy between surprise trial and first control trial
 # reported: χ2(1, N = 40) = 10.00, p < .005, ϕ = .50
@@ -231,13 +231,13 @@ reportObject <- reproCheck(obtainedValue = chi.out$p.value,
 
 reportObject <- reproCheck(obtainedValue = phi.out,
            reportedValue = ".50",
-           valueType = "es")
+           valueType = "phi")
 
 ```
 
 # Step 5: Conclusion
 
-This reproducibility check was a success, with every finding in the target outcomes able to be reproduced from the data provided. However, the authors did not use Yates continuity correction for the chi square tests (which is the default in R) and did not report this. While we were able to figure this out, this posed a problem for reproducing the chi square results initially.
+This reproducibility check was a success, with every finding in the target outcomes able to be reproduced from the data provided.
 
 ```{r}
 Author_Assistance = FALSE # was author assistance provided? (if so, enter TRUE)
