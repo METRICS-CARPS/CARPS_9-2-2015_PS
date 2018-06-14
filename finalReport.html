@@ -559,6 +559,14 @@ locus_analysis &lt;- NA # how many discrete issues did you encounter that relate
 locus_data &lt;- NA # how many discrete issues did you encounter that related to errors in the data files shared by the authors?
 locus_unidentified &lt;- NA # how many discrete issues were there for which you could not identify the cause
 
+# How many of the above issues were resolved through author assistance?
+locus_typo_resolved &lt;- NA # how many discrete issues did you encounter that related to typographical errors?
+locus_specification_resolved &lt;- NA # how many discrete issues did you encounter that related to incomplete, incorrect, or unclear specification of the original analyses?
+locus_analysis_resolved &lt;- NA # how many discrete issues did you encounter that related to errors in the authors' original analyses?
+locus_data_resolved &lt;- NA # how many discrete issues did you encounter that related to errors in the data files shared by the authors?
+locus_unidentified_resolved &lt;- NA # how many discrete issues were there for which you could not identify the cause
+
+
 Affects_Conclusion &lt;- NA # Do any reproducibility issues encounter appear to affect the conclusions made in the original article? This is a subjective judgement, but you should taking into account multiple factors, such as the presence/absence of decision errors, the number of target outcomes that could not be reproduced, the type of outcomes that could or could not be reproduced, the difference in magnitude of effect sizes, and the predictions of the specific hypothesis under scrutiny.</code></pre>
 <pre class="r"><code>reportObject &lt;- reportObject %&gt;%
   filter(dummyRow == FALSE) %&gt;% # remove the dummy row
@@ -580,7 +588,7 @@ if(any(reportObject$comparisonOutcome != &quot;MATCH&quot;) | Insufficient_Infor
 }
 
 # collate report extra details
-reportExtras &lt;- data.frame(articleID, pilotNames, copilotNames, pilotTTC, copilotTTC, pilotStartDate, copilotStartDate, completionDate, Author_Assistance, finalOutcome, Insufficient_Information_Errors, locus_typo, locus_specification, locus_analysis, locus_data, locus_unidentified)
+reportExtras &lt;- data.frame(articleID, pilotNames, copilotNames, pilotTTC, copilotTTC, pilotStartDate, copilotStartDate, completionDate, Author_Assistance, finalOutcome, Insufficient_Information_Errors, locus_typo, locus_specification, locus_analysis, locus_data, locus_unidentified, locus_typo_resolved, locus_specification_resolved, locus_analysis_resolved, locus_data_resolved, locus_unidentified_resolved)
 
 # save report objects
 if(reportType == &quot;pilot&quot;){
@@ -603,7 +611,7 @@ if(reportType == &quot;final&quot;){
 ##  language (EN)                        
 ##  collate  en_US.UTF-8                 
 ##  tz       America/Los_Angeles         
-##  date     2018-06-13                  
+##  date     2018-06-14                  
 ## 
 ##  package      * version  date      
 ##  assertthat     0.2.0    2017-04-11
