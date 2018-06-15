@@ -575,7 +575,7 @@ Affects_Conclusion &lt;- NA # Do any reproducibility issues encounter appear to 
   select(articleID, everything()) # make articleID first column
 
 # decide on final outcome
-if(any(reportObject$comparisonOutcome != &quot;MATCH&quot;) | Insufficient_Information_Errors &gt; 0){
+if(any(reportObject$comparisonOutcome %in% c(&quot;MAJOR_ERROR&quot;, &quot;DECISION_ERROR&quot;)) | Insufficient_Information_Errors &gt; 0){
   finalOutcome &lt;- &quot;Failure without author assistance&quot;
   if(Author_Assistance == T){
     finalOutcome &lt;- &quot;Failure despite author assistance&quot;
@@ -611,7 +611,7 @@ if(reportType == &quot;final&quot;){
 ##  language (EN)                        
 ##  collate  en_US.UTF-8                 
 ##  tz       America/Los_Angeles         
-##  date     2018-06-14                  
+##  date     2018-06-15                  
 ## 
 ##  package      * version  date      
 ##  assertthat     0.2.0    2017-04-11
